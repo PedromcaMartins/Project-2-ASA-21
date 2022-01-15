@@ -22,9 +22,11 @@ int addToVerifyMap(int y, unordered_map<int, int> &arcos);
 int main(){
     assert(lerVariaveisGlobais() != 1);
 
+    printf("v1: %d\t, v2: %d\t, n: %d\t, m: %d\n", v1, v2, n_vertices, n_arcos);
+
     //if lerArcos retornar -1, a arvore geneologica e invalida
-    if (lerArcos() == 1){
-        printf("0");
+    if (lerArcos() == -1){
+        printf("0\n");
         return 0;
     }
 
@@ -55,7 +57,7 @@ int lerArcos(){
         if (addToVerifyMap(y, arcos) == -1)
             return -1; //Arvore geneologica invalida
 
-        //TODO: adicionar uma maneira de guardar os valores do input (o mapa apenas verifica - os)
+        //TODO: #1 adicionar uma maneira de guardar os valores do input (o mapa apenas verifica - os)
     }
 
     return 0;
@@ -63,13 +65,15 @@ int lerArcos(){
 
 /* adiciona os vertices do arco ao mapa, para verificar a validade da arvore geneologica */
 int addToVerifyMap(int y, unordered_map<int, int> &arcos){
-    if (arcos.count(y) == 0) //se o mapa não contiver tiver y,
-        arcos.insert(y, 1); //adiciona-o com um progenitor
+    if (!arcos.count(y)) //se o mapa não contiver tiver y,
+        arcos.insert(pair<int, int>(y, 1)); //adiciona-o com um progenitor
     else{ //senao,
-        if (arcos.at(y) >= 2) //se o vertice tiver mais que 2 progenitores,
+        if (arcos.at(y) >= 2){ //se o vertice tiver mais que 2 progenitores,
             return -1; //arvore invalida
+        }
 
-        arcos.insert(y, 2); //adiciona o segundo progenitor
+        arcos.erase(y);
+        arcos.insert(pair<int, int>(y, 2)); //adiciona o segundo progenitor
     }
 
     return 0; //arvore valida
