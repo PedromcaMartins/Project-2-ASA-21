@@ -20,15 +20,16 @@ int lerArcos();
 int addToVerifyMap(int y, unordered_map<int, int> &arcos);
 
 int main(){
-    assert(lerVariaveisGlobais() != 1);
+    if (lerVariaveisGlobais() == -1)
+        return 0; //se o input está incorreto
 
-    printf("v1: %d\t, v2: %d\t, n: %d\t, m: %d\n", v1, v2, n_vertices, n_arcos);
-
-    //if lerArcos retornar -1, a arvore geneologica e invalida
-    if (lerArcos() == -1){
+    int temp = lerArcos();
+    if (temp == -2){
         printf("0\n");
-        return 0;
-    }
+        return 0; //se a arvore geneologica e invalida
+
+    } else if (temp == -1)
+        return 0; //se o input está incorreto
 
     return 0;
 }
@@ -55,7 +56,7 @@ int lerArcos(){
         if (scanf("%d %d", &x, &y) == 1)
             return -1; //ERROR
         if (addToVerifyMap(y, arcos) == -1)
-            return -1; //Arvore geneologica invalida
+            return -2; //Arvore geneologica invalida
 
         //TODO: #1 adicionar uma maneira de guardar os valores do input (o mapa apenas verifica - os)
     }
