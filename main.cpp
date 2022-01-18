@@ -15,15 +15,11 @@ int n_vertices; //numero de vertices
 int n_arcos;    //numero de arcos
 
 /* protótipos */
-int lerVariaveisGlobais();
-int lerArcos();
+int lerVerificarInputs();
 int addToVerifyMap(int y, unordered_map<int, int> &arcos);
 
 int main(){
-    if (lerVariaveisGlobais() == -1)
-        return 0; //se o input está incorreto
-
-    int temp = lerArcos();
+    int temp = lerVerificarInputs();
     if (temp == -2){
         printf("0\n");
         return 0; //se a arvore geneologica e invalida
@@ -35,18 +31,14 @@ int main(){
 }
 
 /* lê as variaveis globais necessárias para resolver o problema */
-int lerVariaveisGlobais(){
+int lerVerificarInputs(){
     if (scanf("%d %d", &v1, &v2) == 1) //le os vertices v1 e v2
         return -1; //ERROR
 
     if (scanf("%d %d", &n_vertices, &n_arcos) == 1) //le numero de vertices e arcos
         return -1; //ERROR
 
-    return 0;
-}
-
-/* lê e verifica todos os arcos lidos */
-int lerArcos(){
+    // lerArcos(){
     int x, y; //sendo que y é filho de x
     unordered_map<int, int> arcos;
 
