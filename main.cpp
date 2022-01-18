@@ -53,6 +53,15 @@ int lerVerificarInputs(){
         //TODO: #1 adicionar uma maneira de guardar os valores do input (o mapa apenas verifica - os)
     }
 
+    //TODO: #2 se o input é uma DAG, é possivel fazer topological sort
+
+    //TODO: #4 #3 retirar os filhos e filhos desses filhos de v1 ou v2
+
+    /* depois de fazer a ordem topologica, a partir do momento em q 
+    aparece o primeiro dos dois vertices pedidos, ignoram-se todos os que
+    venham daí para a frente, em excessao do outro vertice, uma vez q se existir
+    um backedge, o grafo torna-se ciclico.*/
+
     return 0;
 }
 
