@@ -6,13 +6,29 @@
 #include <cstdio>
 #include <cstring>
 #include <cassert>
+#include <list>
 
 using namespace std;
+
+// https://www.programiz.com/dsa/graph-bfs
+class Graph {
+  int numVertices;
+  list<int>* adjLists;
+  int* visited;
+
+    public:
+  Graph(int vertices);
+  void addEdge(int src, int dest);
+  bool dfs(int startVertex);
+  void bfs(int startVertex);
+  
+};
 
 int v1;         //vertice cujos ancestrais devem ser calculados
 int v2;         //vertice cujos ancestrais devem ser calculados
 int n_vertices; //numero de vertices
 int n_arcos;    //numero de arcos
+Graph grafo;
 
 /* protótipos */
 int lerVerificarInputs();
@@ -27,6 +43,9 @@ int main(){
     } else if (temp == -1)
         return 0; //se o input está incorreto
 
+    // elimina os arcos dos filhos de v1 e v2
+    Graph.emptyArcosFilhos();
+
     return 0;
 }
 
@@ -38,29 +57,27 @@ int lerVerificarInputs(){
     if (scanf("%d %d", &n_vertices, &n_arcos) == 1) //le numero de vertices e arcos
         return -1; //ERROR
 
-    // lerArcos(){
+    // lerArcos
     int x, y; //sendo que y é filho de x
     unordered_map<int, int> arcos;
+    //inicializa o grafo
+    Graph grafo (n_vertices);
 
-    /* loop lê cada caminho, linha a linha e verifica,
-    usando um mapa, a validade da árvore que este representa */
+    /* loop lê cada caminho, linha a linha */
     for (int i = 0; i < n_arcos; i++){
+        // verifica a validade da árvore geneologica
         if (scanf("%d %d", &x, &y) == 1)
             return -1; //ERROR
         if (addToVerifyMap(y, arcos) == -1)
             return -2; //Arvore geneologica invalida
 
-        //TODO: #1 adicionar uma maneira de guardar os valores do input (o mapa apenas verifica - os)
+        //adiciona o arco ao grafo
+        grafo.addEdge(x, y);
     }
 
-    //TODO: #2 se o input é uma DAG, é possivel fazer topological sort
-
-    //TODO: #4 #3 retirar os filhos e filhos desses filhos de v1 ou v2
-
-    /* depois de fazer a ordem topologica, a partir do momento em q 
-    aparece o primeiro dos dois vertices pedidos, ignoram-se todos os que
-    venham daí para a frente, em excessao do outro vertice, uma vez q se existir
-    um backedge, o grafo torna-se ciclico.*/
+    //verifica se o grafo é acíclico
+    if (!grafo.dfs(1))
+        return -2; //Arvore geneologica invalida
 
     return 0;
 }
@@ -80,3 +97,29 @@ int addToVerifyMap(int y, unordered_map<int, int> &arcos){
 
     return 0; //arvore valida
 }
+
+// adiciona os arcos à estrutura do grafo
+void Graph::addEdge(int src, int dest) {
+  adjLists[src].push_back(dest);
+}
+
+bool Graph::dfs(int startVertex){
+    int n;
+    vector<vector<int>> adj;
+    vector<char> color;
+    vector<int> parent;
+    int cycle_start, cycle_end;
+    color[startVertex] = 1;
+    for (int u : adj[startVertex]) {
+        if (color[u] == 0) {
+            parent[u] = startVertex;
+            if (Graph::dfs(u))
+                return true;
+        } else if (color[u] == 1) {
+            return false;
+        }
+    }
+    color[startVertex] = 2;
+    return false;
+}
+
