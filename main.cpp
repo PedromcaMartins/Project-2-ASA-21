@@ -10,23 +10,31 @@
 
 using namespace std;
 
-// https://www.programiz.com/dsa/graph-bfs
 class Node {
     int value;
-    list<Node> parents;
-    list<Node> children;
+    Node* parent1;
+    Node* parent2;
+    list<Node*>* children;
+    int times_visited;
+    int aux_counter;
+
       public:
     Node (int value);
-}
+    //setters
+    int setParent(Node* p1);
+    void setChild(Node* c);
+    //getters
+    Node* getParent1();
+    Node* getParent2();
+    list<Node*> getChildren();
+
+};
 
 class Graph {
-  int numVertices;
-  list<Node>* adjLists;
-  int* visited;
-
+  list<Node*>* vertices;
     public:
-  Graph(int vertices);
-  void addEdge(int src, int dest);
+  Graph();
+  void addVertice();
   void emptyArcosFilhos();
   bool dfs(int startVertex);
   void bfs(int startVertex); 
@@ -37,6 +45,7 @@ int v2;         //vertice cujos ancestrais devem ser calculados
 int n_vertices; //numero de vertices
 int n_arcos;    //numero de arcos
 Graph grafo;
+Node node;
 
 /* protótipos */
 int lerVerificarInputs();
@@ -52,7 +61,7 @@ int main(){
         return 0; //se o input está incorreto
 
     // elimina os arcos dos filhos de v1 e v2
-    grafo.emptyArcosFilhos();
+    /*grafo.emptyArcosFilhos();*/
 
     grafo.visited = new int[grafo.numVertices];
     for (int i = 0; i < numVertices; i++)
@@ -78,7 +87,7 @@ int lerVerificarInputs(){
     int x, y; //sendo que y é filho de x
     unordered_map<int, int> arcos;
     //inicializa o grafo
-    Graph grafo (n_vertices);
+    Graph grafo ();
 
     /* loop lê cada caminho, linha a linha */
     for (int i = 0; i < n_arcos; i++){
@@ -87,7 +96,8 @@ int lerVerificarInputs(){
             return -1; //ERROR
         if (addToVerifyMap(y, arcos) == -1)
             return -2; //Arvore geneologica invalida
-
+        
+        
         //adiciona o arco ao grafo
         grafo.addEdge(x, y);
     }
@@ -117,16 +127,21 @@ int addToVerifyMap(int y, unordered_map<int, int> &arcos){
 
 Node::Node(int num){
     value = num;
-
+    times_visited = 0;
+    aux_counter = 0;
+    children = new list<Node*>();
 }
 
-Graph::Graph(int v) {
-  numVertices = v;
-  adjLists = new list<Node>[v];
+Node::setParent(Node* p){
+    
+}
+
+Graph::Graph() {
+  vertices = new list<Node*>[n_vertices + 1];
 }
 
 // adiciona os arcos à estrutura do grafo
-void Graph::addEdge(int src, int dest) {
+void Node::addEdge(int src, int dest) {
   adjLists[src].push_back(dest);
 }
 
@@ -148,35 +163,38 @@ bool Graph::dfs(int startVertex){
     return false;
 }
 
-void Graph::bfs(int starVertex){
-    list<int> queue;
+void Graph::bfs(Node v){
+    list<Node> queue;
 
-    visited[startVertex]++;
-    queue.push_back(startVertex);
+    v.times_visited++;
+    queue.push_back(v);
 
-    list<int>::iterator i;
+    list<Node>::iterator i;
 
     while (!queue.empty()) {
-        int currVertex = queue.front();
+        Node currVertex = queue.front();
         queue.pop_front();
 
-        for (i = adjLists[currVertex].begin(); i != adjLists[currVertex].end(); ++i) {
-            int adjVertex = *i;
-            if (visited[adjVertex] == 0) {
-                visited[adjVertex]++;
-                queue.push_back(adjVertex);
+        for (i = currVertex.parents.begin(); i != currVertex.parents.end(); ++i) {
+            if (i.times_visited == 0) {
+                i.times_visited++;
+                queue.push_back(i);
             }
-            else if (visited[adjVertex] == 1){
-                visited[adjVertex]++;
+            else if (i.times_visited == 1){
+                i.times_visited++;
+                if (i.aux_counter == 0)
+                    grafo.push_back(i.value);
+                if ()
+                
                 queue.push_back(adjVertex);
             }
         }
     }
 }
 
-void Graph::emptyArcosFilhos(){
+/*void Graph::emptyArcosFilhos(){
     if (adjLists[v1].size() != 0)
         adjLists[v1].erase();
     if (adjLists[v2].size() != 0)
-        adjLists[v2].erase();
+        adjLists[v2].erase();*/
 }
