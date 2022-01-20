@@ -11,17 +11,25 @@
 using namespace std;
 
 // https://www.programiz.com/dsa/graph-bfs
+class Node {
+    int value;
+    list<Node> parents;
+    list<Node> children;
+      public:
+    Node (int value);
+}
+
 class Graph {
   int numVertices;
-  list<int>* adjLists;
+  list<Node>* adjLists;
   int* visited;
 
     public:
   Graph(int vertices);
   void addEdge(int src, int dest);
+  void emptyArcosFilhos();
   bool dfs(int startVertex);
-  void bfs(int startVertex);
-  
+  void bfs(int startVertex); 
 };
 
 int v1;         //vertice cujos ancestrais devem ser calculados
@@ -44,7 +52,16 @@ int main(){
         return 0; //se o input está incorreto
 
     // elimina os arcos dos filhos de v1 e v2
-    Graph.emptyArcosFilhos();
+    grafo.emptyArcosFilhos();
+
+    grafo.visited = new int[grafo.numVertices];
+    for (int i = 0; i < numVertices; i++)
+        visited[i] = 0;
+    grafo.bfs(v1);
+    grafo.bfs(v2);
+
+
+
 
     return 0;
 }
@@ -98,6 +115,16 @@ int addToVerifyMap(int y, unordered_map<int, int> &arcos){
     return 0; //arvore valida
 }
 
+Node::Node(int num){
+    value = num;
+
+}
+
+Graph::Graph(int v) {
+  numVertices = v;
+  adjLists = new list<Node>[v];
+}
+
 // adiciona os arcos à estrutura do grafo
 void Graph::addEdge(int src, int dest) {
   adjLists[src].push_back(dest);
@@ -105,12 +132,10 @@ void Graph::addEdge(int src, int dest) {
 
 bool Graph::dfs(int startVertex){
     int n;
-    vector<vector<int>> adj;
-    vector<char> color;
+    vector<int> color;
     vector<int> parent;
-    int cycle_start, cycle_end;
     color[startVertex] = 1;
-    for (int u : adj[startVertex]) {
+    for (int u : adjLists[startVertex]) {
         if (color[u] == 0) {
             parent[u] = startVertex;
             if (Graph::dfs(u))
@@ -123,3 +148,35 @@ bool Graph::dfs(int startVertex){
     return false;
 }
 
+void Graph::bfs(int starVertex){
+    list<int> queue;
+
+    visited[startVertex]++;
+    queue.push_back(startVertex);
+
+    list<int>::iterator i;
+
+    while (!queue.empty()) {
+        int currVertex = queue.front();
+        queue.pop_front();
+
+        for (i = adjLists[currVertex].begin(); i != adjLists[currVertex].end(); ++i) {
+            int adjVertex = *i;
+            if (visited[adjVertex] == 0) {
+                visited[adjVertex]++;
+                queue.push_back(adjVertex);
+            }
+            else if (visited[adjVertex] == 1){
+                visited[adjVertex]++;
+                queue.push_back(adjVertex);
+            }
+        }
+    }
+}
+
+void Graph::emptyArcosFilhos(){
+    if (adjLists[v1].size() != 0)
+        adjLists[v1].erase();
+    if (adjLists[v2].size() != 0)
+        adjLists[v2].erase();
+}
