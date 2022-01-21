@@ -75,11 +75,11 @@ int main(){
 
     /* executa 2 BFS's: para cada vértice visitadol,
     incrementa o contador de visitas de vertices */
-    grafo->bfs(v1);
-    grafo->bfs(v2);
+    //grafo->bfs(v1); //TODO: #8 BFS
+    //grafo->bfs(v2);
 
     //por fim, executa a funcao solve que vai resolver o resto do problema
-    grafo->solve();
+    //grafo->solve();
 
     return 0;
 }
@@ -112,8 +112,8 @@ int lerVerificarInputs(){
     }
 
     //verifica se o grafo é acíclico
-    if (!grafo->dfs(1))
-        return -2; //Arvore geneologica invalida
+    //if (!grafo->dfs(1)) //TODO: #7 dfs
+        //return -2; //Arvore geneologica invalida
 
     return 0;
 }
@@ -150,11 +150,11 @@ void Node::setChild(int c){ this->children.push_back(grafo->getNode(c)); }
 
 int Node::getValue(){ return this->value; }
 
-Node* Node::getParent1(){ this->parent1; }
+Node* Node::getParent1(){ return this->parent1; }
 
-Node* Node::getParent2(){ this->parent2; }
+Node* Node::getParent2(){ return this->parent2; }
 
-vector<Node*> Node::getChildren(){ this->children; }
+vector<Node*> Node::getChildren(){ return this->children; }
 
 void Node::incrementParents(){
     //increments parent1's counter
@@ -181,7 +181,7 @@ Graph::Graph() {
 
 void Graph::addEdge(int src, int dest){ this->getNode(src)->setChild(dest); }
 Node* Graph::getNode(int v){ return this->vertices.at(v); }
-
+/*
 bool Graph::dfs(int startVertex){
     int n;
     vector<int> color;
@@ -228,7 +228,7 @@ void Graph::bfs(Node *v){
         }
     }
 }
-
+*/
 void Graph::solve(){
     // incrementa os contadores dos pais que pertencem às 2 BFS's
     for (Node* n: grafo->commonParents){
@@ -246,7 +246,7 @@ void Graph::solve(){
         }
     }
 
-    sort(finalResult); //TODO: #6 #5 implementar a funcao sort;
+    sort(finalResult, finalResult + i+1); //TODO: #6 #5 implementar a funcao sort;
 
     // imprime o resultado no terminal
     for (int j = 0; j < i - 1; j++){
