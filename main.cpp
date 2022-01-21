@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cassert>
-#include <list>
+#include <vector>
 
 using namespace std;
 
@@ -14,7 +14,7 @@ class Node {
     int value;
     Node* parent1;
     Node* parent2;
-    list<Node*>* children;
+    vector<Node*> children;
     int times_visited;
     int aux_counter;
 
@@ -24,32 +24,42 @@ class Node {
     int setParent(Node* p1);
     void setChild(Node* c);
     //getters
+    int getValue();
     Node* getParent1();
     Node* getParent2();
-    list<Node*> getChildren();
+    vector<Node*> getChildren();
+    int getCounter();
+    int getTimesVisited();
+
+    void incrementParents();
+    void incrementCounter();
+    void incrementTimesVisited();
 
 };
 
 class Graph {
-  list<Node*>* vertices;
-    public:
-  Graph();
-  void addVertice();
-  void emptyArcosFilhos();
-  bool dfs(int startVertex);
-  void bfs(int startVertex); 
+    vector<Node*> vertices;
+    vector<Node*> commonParents;
+
+        public:
+    Graph();
+    void addEdge(int src, int dest);
+    Node* getNode(int v);
+
+    bool dfs(int startVertex);
+    void bfs(int startVertex); 
+    void solve();
 };
 
 int v1;         //vertice cujos ancestrais devem ser calculados
 int v2;         //vertice cujos ancestrais devem ser calculados
 int n_vertices; //numero de vertices
 int n_arcos;    //numero de arcos
-Graph grafo;
-Node node;
+Graph* grafo;
 
 /* protótipos */
 int lerVerificarInputs();
-int addToVerifyMap(int y, unordered_map<int, int> &arcos);
+void removeChildren(); //remove as criancas dos vertices v1 e v2
 
 int main(){
     int temp = lerVerificarInputs();
@@ -63,14 +73,13 @@ int main(){
     // elimina os arcos dos filhos de v1 e v2
     /*grafo.emptyArcosFilhos();*/
 
-    grafo.visited = new int[grafo.numVertices];
-    for (int i = 0; i < numVertices; i++)
-        visited[i] = 0;
-    grafo.bfs(v1);
-    grafo.bfs(v2);
+    /* executa 2 BFS's: para cada vértice visitadol,
+    incrementa o contador de visitas de vertices */
+    grafo->bfs(v1);
+    grafo->bfs(v2);
 
-
-
+    //por fim, executa a funcao solve que vai resolver o resto do problema
+    grafo->solve();
 
     return 0;
 }
@@ -85,65 +94,92 @@ int lerVerificarInputs(){
 
     // lerArcos
     int x, y; //sendo que y é filho de x
-    unordered_map<int, int> arcos;
     //inicializa o grafo
-    Graph grafo ();
+    grafo = new Graph();
 
     /* loop lê cada caminho, linha a linha */
     for (int i = 0; i < n_arcos; i++){
         // verifica a validade da árvore geneologica
         if (scanf("%d %d", &x, &y) == 1)
             return -1; //ERROR
-        if (addToVerifyMap(y, arcos) == -1)
+
+        //se o node y do grafo tiver mais que 2 pais,
+        if (grafo->getNode(y)->setParent(grafo->getNode(x)) == -1)
             return -2; //Arvore geneologica invalida
-        
-        
+
         //adiciona o arco ao grafo
-        grafo.addEdge(x, y);
+        grafo->addEdge(x, y);
     }
 
     //verifica se o grafo é acíclico
-    if (!grafo.dfs(1))
+    if (!grafo->dfs(1))
         return -2; //Arvore geneologica invalida
 
     return 0;
 }
 
-/* adiciona os vertices do arco ao mapa, para verificar a validade da arvore geneologica */
-int addToVerifyMap(int y, unordered_map<int, int> &arcos){
-    if (!arcos.count(y)) //se o mapa não contiver tiver y,
-        arcos.insert(pair<int, int>(y, 1)); //adiciona-o com um progenitor
-    else{ //senao,
-        if (arcos.at(y) >= 2){ //se o vertice tiver mais que 2 progenitores,
-            return -1; //arvore invalida
-        }
-
-        arcos.erase(y);
-        arcos.insert(pair<int, int>(y, 2)); //adiciona o segundo progenitor
-    }
-
-    return 0; //arvore valida
-}
-
+// metodos de Node
 Node::Node(int num){
     value = num;
+    parent1 = NULL;
+    parent2 = NULL;
+    children = *new vector<Node*>();
     times_visited = 0;
     aux_counter = 0;
-    children = new list<Node*>();
 }
 
-Node::setParent(Node* p){
-    
+int Node::setParent(Node* p){
+    //if *this* has no parents
+    if (this->parent1 == NULL){
+        this->parent1 = p;
+        return 0;
+    }
+    //if *this* has one parent
+    else if (this->parent2 == NULL){
+        this->parent2 = p;
+        return 0;
+    }
+    //if *this* has both parents
+    else
+        return -1;
+
 }
 
+void Node::setChild(Node* c){ this->children.push_back(c); }
+
+int Node::getValue(){ return this->value; }
+
+Node* Node::getParent1(){ this->parent1; }
+
+Node* Node::getParent2(){ this->parent2; }
+
+vector<Node*> Node::getChildren(){ this->children; }
+
+void Node::incrementParents(){
+    //increments parent1's counter
+    Node* temp;
+    if ((temp = getParent1()) != NULL){
+        temp->aux_counter++;
+    }
+    //increments parent2's counter
+    if ((temp = getParent2()) != NULL){
+        temp->aux_counter++;
+    }
+}
+
+int Node::getCounter(){ return this->aux_counter; }
+int Node::getTimesVisited(){ return this->times_visited; }
+void Node::incrementCounter(){ this->aux_counter++; }
+void Node::incrementTimesVisited(){ this->times_visited++; }
+
+// metodos de graph
 Graph::Graph() {
-  vertices = new list<Node*>[n_vertices + 1];
+    vertices = *new vector<Node*>();
+    commonParents = *new vector<Node*>();
 }
 
-// adiciona os arcos à estrutura do grafo
-void Node::addEdge(int src, int dest) {
-  adjLists[src].push_back(dest);
-}
+void Graph::addEdge(int src, int dest){ this->getNode(src)->setChild(this->getNode(dest)); }
+Node* Graph::getNode(int v){ return this->vertices.at(v); }
 
 bool Graph::dfs(int startVertex){
     int n;
@@ -163,13 +199,13 @@ bool Graph::dfs(int startVertex){
     return false;
 }
 
-void Graph::bfs(Node v){
-    list<Node> queue;
+void Graph::bfs(Node *v){
+    vector<Node> queue;
 
-    v.times_visited++;
+    v->times_visited++;
     queue.push_back(v);
 
-    list<Node>::iterator i;
+    vector<Node>::iterator i;
 
     while (!queue.empty()) {
         Node currVertex = queue.front();
@@ -192,9 +228,30 @@ void Graph::bfs(Node v){
     }
 }
 
-/*void Graph::emptyArcosFilhos(){
-    if (adjLists[v1].size() != 0)
-        adjLists[v1].erase();
-    if (adjLists[v2].size() != 0)
-        adjLists[v2].erase();*/
+void Graph::solve(){
+    // incrementa os contadores dos pais que pertencem às 2 BFS's
+    for (Node* n: grafo->commonParents){
+        n->incrementParents();
+    }
+    
+    int i = 0;
+    int finalResult[n_vertices];
+
+    // caso o contador dos pais q pertencem as 2 BFS's seja == 0, esse nó faz parte da solucao
+    for (Node* n: grafo->commonParents){
+        if (n->getCounter() == 0){
+            finalResult[i] = (n->getValue());
+            i++;
+        }
+    }
+
+    sort(finalResult); //TODO: #6 #5 implementar a funcao sort;
+
+    // imprime o resultado no terminal
+    for (int j = 0; j < i - 1; j++){
+        printf("%d ", finalResult[j]);
+    }
+
+    printf("%d\n", finalResult[i]);
+
 }

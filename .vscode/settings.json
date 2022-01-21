@@ -26,5 +26,10 @@
     "**/.*/**",
     "**/.vscode",
     "**/.vscode/**"
-  ]
+  ],
+  "files.associations": {
+    "*.tcc": "cpp",
+    "vector": "cpp",
+    "list": "cpp"
+  }
 }
