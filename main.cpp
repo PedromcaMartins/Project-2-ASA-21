@@ -21,8 +21,8 @@ class Node {
       public:
     Node (int value);
     //setters
-    int setParent(Node* p1);
-    void setChild(Node* c);
+    int setParent(int p1);
+    void setChild(int c);
     //getters
     int getValue();
     Node* getParent1();
@@ -104,7 +104,7 @@ int lerVerificarInputs(){
             return -1; //ERROR
 
         //se o node y do grafo tiver mais que 2 pais,
-        if (grafo->getNode(y)->setParent(grafo->getNode(x)) == -1)
+        if (grafo->getNode(y)->setParent(x) == -1)
             return -2; //Arvore geneologica invalida
 
         //adiciona o arco ao grafo
@@ -128,7 +128,8 @@ Node::Node(int num){
     aux_counter = 0;
 }
 
-int Node::setParent(Node* p){
+int Node::setParent(int parent){
+    Node* p = grafo->getNode(parent);
     //if *this* has no parents
     if (this->parent1 == NULL){
         this->parent1 = p;
@@ -145,7 +146,7 @@ int Node::setParent(Node* p){
 
 }
 
-void Node::setChild(Node* c){ this->children.push_back(c); }
+void Node::setChild(int c){ this->children.push_back(grafo->getNode(c)); }
 
 int Node::getValue(){ return this->value; }
 
@@ -178,7 +179,7 @@ Graph::Graph() {
     commonParents = *new vector<Node*>();
 }
 
-void Graph::addEdge(int src, int dest){ this->getNode(src)->setChild(this->getNode(dest)); }
+void Graph::addEdge(int src, int dest){ this->getNode(src)->setChild(dest); }
 Node* Graph::getNode(int v){ return this->vertices.at(v); }
 
 bool Graph::dfs(int startVertex){
