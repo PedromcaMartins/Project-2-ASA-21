@@ -30,6 +30,8 @@
   "files.associations": {
     "*.tcc": "cpp",
     "vector": "cpp",
-    "list": "cpp"
+    "list": "cpp",
+    "cassert": "cpp",
+    "deque": "cpp"
   }
 }
