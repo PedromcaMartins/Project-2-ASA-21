@@ -17,24 +17,27 @@ class Node {
     Node* parent1;
     Node* parent2;
     vector<int> children; //TODO: #9  acrescentar os nos dos pais
-    int times_visited;
-    int aux_counter;
+    bool times_visited;
+    bool aux_counter;
+    bool finalResult;
 
       public:
     Node (int value);
     //setters
     int setParent(int p1);
     void setChild(int c);
+    void setCounter();
+    void setTimesVisited();
+    void setFinalResult();
     //getters
     int getValue();
     Node* getParent(int p);
     vector<int> getChildren();
     int getCounter();
     int getTimesVisited();
+    bool getFinalResult();
     //increments
     void incrementParents();
-    void incrementCounter();
-    void incrementTimesVisited();
 
 };
 
@@ -131,6 +134,7 @@ Node::Node(int num){
     children = *new vector<int>();
     times_visited = 0;
     aux_counter = 0;
+    finalResult = 0;
 }
 
 int Node::setParent(int parent){
@@ -166,18 +170,20 @@ void Node::incrementParents(){
     //increments parent1's counter
     Node* temp;
     if ((temp = getParent(1)) != NULL){
-        temp->aux_counter++;
+        temp->aux_counter = 1;
     }
     //increments parent2's counter
     if ((temp = getParent(2)) != NULL){
-        temp->aux_counter++;
+        temp->aux_counter = 1;
     }
 }
 
 int Node::getCounter(){ return this->aux_counter; }
 int Node::getTimesVisited(){ return this->times_visited; }
-void Node::incrementCounter(){ this->aux_counter++; }
-void Node::incrementTimesVisited(){ this->times_visited++; }
+void Node::setCounter(){ this->aux_counter = 1; }
+void Node::setTimesVisited(){ this->times_visited = 1; }
+void Node::setFinalResult(){ this->finalResult = 1; }
+bool Node::getFinalResult(){ return this->finalResult; }
 
 
 void Graph::setCommonParents(int cp){ this->commonParents.push_back(grafo->getNode(cp));}
@@ -236,9 +242,9 @@ void Graph::bfs(Node* v, int x){
     list<Node*> queue;
     Node* parent;
 
-    v->incrementTimesVisited();
-    if (v->getTimesVisited() == 2 && x == 2)
+    if (v->getTimesVisited() && x == 2)
         grafo->setCommonParents(v->getValue());
+    v->setTimesVisited();
 
     queue.push_back(v);
 
@@ -251,13 +257,13 @@ void Graph::bfs(Node* v, int x){
             if ((parent = currVertex->getParent(i)) == NULL)
                 break;
             //senao: //acrescentar explicacao
-            if (parent->getTimesVisited() == 0) {
+            if (!parent->getTimesVisited()) {
                 queue.push_back(parent);
                 if (x == 1)
-                    parent->incrementTimesVisited();
+                    parent->setTimesVisited();
             }
-            else if (parent->getTimesVisited() == 1 && x == 2){
-                parent->incrementTimesVisited();
+            else if (parent->getTimesVisited() && x == 2 && !parent->getFinalResult()){
+                parent->setFinalResult();
                 grafo->setCommonParents(parent->getValue());
                 queue.push_back(parent);
             }
@@ -281,7 +287,7 @@ void Graph::solve(){
 
     // caso o contador dos pais q pertencem as 2 BFS's seja == 0, esse nó faz parte da solucao
     for (Node* n: grafo->commonParents){
-        if (n->getCounter() == 0){
+        if (!n->getCounter()){
             finalResult[i] = (n->getValue());
             i++;
         }
