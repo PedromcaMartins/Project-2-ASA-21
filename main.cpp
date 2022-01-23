@@ -82,6 +82,7 @@ int main(){
 
     //por fim, executa a funcao solve que vai resolver o resto do problema
     grafo->solve();
+    printf("\n");
 
     return 0;
 }
