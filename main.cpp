@@ -8,7 +8,7 @@
 #include <cassert>
 #include <list>
 
-//TODO: remover classe grafo e alterar scanf's para Cin
+//TODO: remover classe grafo 
 
 using namespace std;
 
