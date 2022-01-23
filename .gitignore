@@ -3,3 +3,4 @@ tests
 build/Debug/main.o
 Tree
 build/Debug/outDebug
+results.txt
