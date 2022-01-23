@@ -41,35 +41,31 @@ class Node {
 
 };
 
-class Graph {
-    vector<Node*> vertices;
-    vector<Node*> commonParents;
-
-        public:
-    Graph();
-    void addEdge(int src, int dest);
-    Node* getNode(int v);
-
-    void setCommonParents(int cp);
-    bool dfs(Node* v);
-    void bfs(Node* v, int x);
-    void solve();
-};
-
 //VARIAVEIS GLOBAIS
 int v1;         //vertice cujos ancestrais devem ser calculados
 int v2;         //vertice cujos ancestrais devem ser calculados
 int n_vertices; //numero de vertices
 int n_arcos;    //numero de arcos
-Graph* grafo;
 //dfs
 vector<char> color;
 vector<int> parent;
 int cycle_start, cycle_end;
+//grafo
+vector<Node*> vertices;
+vector<Node*> commonParents;
 
 /* protótipos */
 int lerVerificarInputs();
 int find_cycle();
+//grafo
+void inicializaGrafo();
+Node* getNode(int v);
+void addEdge(int src, int dest);
+void setCommonParents(int cp);
+
+bool dfs(Node* v);
+void bfs(Node* v, int x);
+void solve();
 
 int main(){
     int temp = lerVerificarInputs();
@@ -82,11 +78,11 @@ int main(){
 
     /* executa 2 BFS's: para cada vértice visitadol,
     incrementa o contador de visitas de vertices */
-    grafo->bfs(grafo->getNode(v1), 1); //TODO: #8 BFS
-    grafo->bfs(grafo->getNode(v2), 2);
+    bfs(getNode(v1), 1); //TODO: #8 BFS
+    bfs(getNode(v2), 2);
 
     //por fim, executa a funcao solve que vai resolver o resto do problema
-    grafo->solve();
+    solve();
 
     return 0;
 }
@@ -102,7 +98,7 @@ int lerVerificarInputs(){
     // lerArcos
     int x, y; //sendo que y é filho de x
     //inicializa o grafo
-    grafo = new Graph();
+    inicializaGrafo();
 
     /* loop lê cada caminho, linha a linha */
     for (int i = 0; i < n_arcos; i++){
@@ -111,11 +107,11 @@ int lerVerificarInputs(){
             return -1; //ERROR
 
         //se o node y do grafo tiver mais que 2 pais,
-        if (grafo->getNode(y)->setParent(x) == -1)
+        if (getNode(y)->setParent(x) == -1)
             return -2; //Arvore geneologica invalida
 
         //adiciona o arco ao grafo
-        grafo->addEdge(x, y);
+        addEdge(x, y);
     }
 
     //verifica se o grafo é ciclico
@@ -138,7 +134,7 @@ Node::Node(int num){
 }
 
 int Node::setParent(int parent){
-    Node* p = grafo->getNode(parent);
+    Node* p = getNode(parent);
     //if *this* has no parents
     if (this->parent1 == NULL){
         this->parent1 = p;
@@ -186,10 +182,10 @@ void Node::setFinalResult(){ this->finalResult = 1; }
 bool Node::getFinalResult(){ return this->finalResult; }
 
 
-void Graph::setCommonParents(int cp){ this->commonParents.push_back(grafo->getNode(cp));}
+void setCommonParents(int cp){ commonParents.push_back(getNode(cp));}
 
 // metodos de graph
-Graph::Graph() {
+void inicializaGrafo() {
     vertices = *new vector<Node*>();
     commonParents = *new vector<Node*>();
 
@@ -200,13 +196,13 @@ Graph::Graph() {
     }
 }
 
-void Graph::addEdge(int src, int dest){ this->getNode(src)->setChild(dest); }
-Node* Graph::getNode(int v){ return this->vertices.at(v); }
+void addEdge(int src, int dest){ getNode(src)->setChild(dest); }
+Node* getNode(int v){ return vertices.at(v); }
 
 //https://cp-algorithms.com/graph/finding-cycle.html
 bool dfs(int v) {
     color[v] = 1;
-    for (int u : grafo->getNode(v)->getChildren()) {
+    for (int u : getNode(v)->getChildren()) {
         if (color[u] == 0) {
             parent[u] = v;
             if (dfs(u))
@@ -238,12 +234,12 @@ int find_cycle() {
     }
 }
 
-void Graph::bfs(Node* v, int x){
+void bfs(Node* v, int x){
     list<Node*> queue;
     Node* parent;
 
     if (v->getTimesVisited() && x == 2)
-        grafo->setCommonParents(v->getValue());
+        setCommonParents(v->getValue());
     v->setTimesVisited();
 
     queue.push_back(v);
@@ -264,21 +260,21 @@ void Graph::bfs(Node* v, int x){
             }
             else if (parent->getTimesVisited() && x == 2 && !parent->getFinalResult()){
                 parent->setFinalResult();
-                grafo->setCommonParents(parent->getValue());
+                setCommonParents(parent->getValue());
                 queue.push_back(parent);
             }
         }
     }
 }
 
-void Graph::solve(){
+void solve(){
     // caso não existam pais comuns
-    if (grafo->commonParents.empty()){
+    if (commonParents.empty()){
         printf("-\n");
         return;
         }
     // incrementa os contadores dos pais que pertencem às 2 BFS's
-    for (Node* n: grafo->commonParents){
+    for (Node* n: commonParents){
         n->incrementParents();
     }
 
@@ -286,7 +282,7 @@ void Graph::solve(){
     int finalResult[n_vertices];
 
     // caso o contador dos pais q pertencem as 2 BFS's seja == 0, esse nó faz parte da solucao
-    for (Node* n: grafo->commonParents){
+    for (Node* n: commonParents){
         if (!n->getCounter()){
             finalResult[i] = (n->getValue());
             i++;
