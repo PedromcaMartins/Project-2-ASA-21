@@ -8,6 +8,8 @@
 #include <cassert>
 #include <list>
 
+//TODO: remover classe grafo e alterar scanf's para Cin
+
 using namespace std;
 
 class Node {
