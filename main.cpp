@@ -84,7 +84,6 @@ int main(){
 
     //por fim, executa a funcao solve que vai resolver o resto do problema
     grafo->solve();
-    printf("\n");
 
     return 0;
 }
@@ -268,8 +267,10 @@ void Graph::bfs(Node* v, int x){
 
 void Graph::solve(){
     // caso não existam pais comuns
-    if (grafo->commonParents.empty())
+    if (grafo->commonParents.empty()){
         printf("-\n");
+        return;
+        }
     // incrementa os contadores dos pais que pertencem às 2 BFS's
     for (Node* n: grafo->commonParents){
         n->incrementParents();
@@ -292,5 +293,6 @@ void Graph::solve(){
     for (int j = 0; j < i; j++){
         printf("%d ", finalResult[j]);
     }
+    printf("\n");
 
 }
