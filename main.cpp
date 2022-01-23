@@ -8,15 +8,13 @@
 #include <cassert>
 #include <list>
 
-//TODO: remover classe grafo 
-
 using namespace std;
 
 class Node {
     int value;
     Node* parent1;
     Node* parent2;
-    vector<int> children; //TODO: #9  acrescentar os nos dos pais
+    vector<int> children;
     bool times_visited;
     bool aux_counter;
     bool finalResult;
@@ -47,7 +45,7 @@ int v2;         //vertice cujos ancestrais devem ser calculados
 int n_vertices; //numero de vertices
 int n_arcos;    //numero de arcos
 //dfs
-vector<char> color;
+vector<int> color;
 vector<int> parent;
 int cycle_start, cycle_end;
 //grafo
