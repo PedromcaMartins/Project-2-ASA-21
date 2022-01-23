@@ -5,3 +5,5 @@ Tree
 build/Debug/outDebug
 results.txt
 input.txt
+callgrind.out
+output.svg

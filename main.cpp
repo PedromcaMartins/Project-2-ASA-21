@@ -59,13 +59,16 @@ int find_cycle();
 void inicializaGrafo();
 Node* getNode(int v);
 void addEdge(int src, int dest);
-void setCommonParents(int cp);
+void setCommonParents(Node* cp);
 
 bool dfs(Node* v);
 void bfs(Node* v, int x);
 void solve();
 
 int main(){
+    vector<int> color = *new vector<int>();
+    vector<int> parent = *new vector<int>();
+
     int temp = lerVerificarInputs();
     if (temp == -2){
         printf("0\n");
@@ -180,7 +183,7 @@ void Node::setFinalResult(){ this->finalResult = 1; }
 bool Node::getFinalResult(){ return this->finalResult; }
 
 
-void setCommonParents(int cp){ commonParents.push_back(getNode(cp));}
+void setCommonParents(Node* cp){ commonParents.push_back(cp);}
 
 // metodos de graph
 void inicializaGrafo() {
@@ -237,7 +240,7 @@ void bfs(Node* v, int x){
     Node* parent;
 
     if (v->getTimesVisited() && x == 2)
-        setCommonParents(v->getValue());
+        setCommonParents(v);
     v->setTimesVisited();
 
     queue.push_back(v);
@@ -258,7 +261,7 @@ void bfs(Node* v, int x){
             }
             else if (parent->getTimesVisited() && x == 2 && !parent->getFinalResult()){
                 parent->setFinalResult();
-                setCommonParents(parent->getValue());
+                setCommonParents(parent);
                 queue.push_back(parent);
             }
         }
