@@ -7,3 +7,4 @@ results.txt
 input.txt
 callgrind.out
 output.svg
+runTests.sh

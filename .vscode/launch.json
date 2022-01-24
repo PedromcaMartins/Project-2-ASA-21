@@ -3,6 +3,20 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Launch test",
+      "request": "launch",
+      "mainClass": "test",
+      "projectName": "Project-2-ASA-21_291b0ec1"
+    },
+    {
+      "type": "java",
+      "name": "Launch smol_test",
+      "request": "launch",
+      "mainClass": "smol_test",
+      "projectName": "Project-2-ASA-21_291b0ec1"
+    },
+    {
+      "type": "java",
       "name": "Launch smol_test",
       "request": "launch",
       "mainClass": "smol_test",

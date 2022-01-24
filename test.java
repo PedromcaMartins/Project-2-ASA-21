@@ -12,7 +12,7 @@ public class test{
                 String myoutLine = myout.readLine();
                 String outLine = out.readLine();
 
-                if (!myoutLine.equals(outLine) && !myoutLine.equals("0")){
+                if (!myoutLine.equals(outLine)){
                     System.out.println(i);
                 }
             }

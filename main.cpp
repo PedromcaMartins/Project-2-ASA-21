@@ -20,7 +20,7 @@ class Node {
     bool finalResult;
 
       public:
-    Node (int value);
+    Node (int num, vector<int>* vector_children);
     //setters
     int setParent(int p1);
     void setChild(int c);
@@ -45,8 +45,8 @@ int v2;         //vertice cujos ancestrais devem ser calculados
 int n_vertices; //numero de vertices
 int n_arcos;    //numero de arcos
 //dfs
-vector<int> color;
-vector<int> parent;
+vector<int> color = *new vector<int>();
+vector<int> parent = *new vector<int>();
 int cycle_start, cycle_end;
 //grafo
 vector<Node*> vertices;
@@ -66,9 +66,6 @@ void bfs(Node* v, int x);
 void solve();
 
 int main(){
-    vector<int> color = *new vector<int>();
-    vector<int> parent = *new vector<int>();
-
     int temp = lerVerificarInputs();
     if (temp == -2){
         printf("0\n");
@@ -124,18 +121,18 @@ int lerVerificarInputs(){
 }
 
 // metodos de Node
-Node::Node(int num){
+Node::Node(int num, vector<int>* vector_children){
     value = num;
     parent1 = NULL;
     parent2 = NULL;
-    children = *new vector<int>();
+    children = *vector_children;
     times_visited = 0;
     aux_counter = 0;
     finalResult = 0;
 }
 
-int Node::setParent(int parent){
-    Node* p = getNode(parent);
+int Node::setParent(int int_parent){
+    Node* p = getNode(int_parent);
     //if *this* has no parents
     if (this->parent1 == NULL){
         this->parent1 = p;
@@ -190,10 +187,11 @@ void inicializaGrafo() {
     vertices = *new vector<Node*>();
     commonParents = *new vector<Node*>();
 
-    vertices.push_back(new Node(-1));
+    vertices.push_back(NULL);
     // adiciona inicializa e adiciona os nós ao grafo
     for (int i = 1; i < n_vertices + 1; i++){
-        vertices.push_back(new Node(i));
+        vector<int> *temp  = new vector<int>;
+        vertices.push_back(new Node(i, temp));
     }
 }
 
@@ -223,7 +221,7 @@ int find_cycle() {
     parent.assign(n_vertices, -1);
     cycle_start = -1;
 
-    for (int v = 0; v < n_vertices; v++) {
+    for (int v = 1; v < n_vertices + 1; v++) {
         if (color[v] == 0 && dfs(v))
             break;
     }
@@ -236,8 +234,8 @@ int find_cycle() {
 }
 
 void bfs(Node* v, int x){
-    list<Node*> queue;
-    Node* parent;
+    list<Node*> queue = *new list<Node*>();
+    Node* Node_parent;
 
     if (v->getTimesVisited() && x == 2)
         setCommonParents(v);
@@ -251,18 +249,18 @@ void bfs(Node* v, int x){
 
         for (int i = 1; i != 3; ++i) {
             //se o node nao tiver o pai i,
-            if ((parent = currVertex->getParent(i)) == NULL)
+            if ((Node_parent = currVertex->getParent(i)) == NULL)
                 break;
             //senao: //acrescentar explicacao
-            if (!parent->getTimesVisited()) {
-                queue.push_back(parent);
+            if (!Node_parent->getTimesVisited()) {
+                queue.push_back(Node_parent);
                 if (x == 1)
-                    parent->setTimesVisited();
+                    Node_parent->setTimesVisited();
             }
-            else if (parent->getTimesVisited() && x == 2 && !parent->getFinalResult()){
-                parent->setFinalResult();
-                setCommonParents(parent);
-                queue.push_back(parent);
+            else if (Node_parent->getTimesVisited() && x == 2 && !Node_parent->getFinalResult()){
+                Node_parent->setFinalResult();
+                setCommonParents(Node_parent);
+                queue.push_back(Node_parent);
             }
         }
     }
@@ -279,22 +277,19 @@ void solve(){
         n->incrementParents();
     }
 
-    int i = 0;
-    int finalResult[n_vertices];
+    vector<int> finalResult = *new vector<int>();
 
     // caso o contador dos pais q pertencem as 2 BFS's seja == 0, esse nó faz parte da solucao
     for (Node* n: commonParents){
-        if (!n->getCounter()){
-            finalResult[i] = (n->getValue());
-            i++;
-        }
+        if (!n->getCounter())
+            finalResult.push_back(n->getValue());
     }
 
-    sort(finalResult, finalResult + i); //TODO: #6 #5 implementar a funcao sort;
+    sort(finalResult.begin(), finalResult.end()); //TODO: #6 #5 implementar a funcao sort;
 
     // imprime o resultado no terminal
-    for (int j = 0; j < i; j++){
-        printf("%d ", finalResult[j]);
+    for (int j: finalResult){
+        printf("%d ", j);
     }
     printf("\n");
 
