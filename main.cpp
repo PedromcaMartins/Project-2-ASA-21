@@ -14,25 +14,28 @@ class Node {
     int value;
     Node* parent1;
     Node* parent2;
-    vector<int> children;
-    bool times_visited;
+    vector<Node*> children;
+    bool is_visited;
+    int times_visited;
     bool aux_counter;
     bool finalResult;
 
       public:
-    Node (int num, vector<int>* vector_children);
+    Node (int num, vector<Node*>* vector_children);
     //setters
     int setParent(int p1);
     void setChild(int c);
     void setCounter();
-    void setTimesVisited();
+    void setTimesVisited(int t);
+    void setIsVisited();
     void setFinalResult();
     //getters
     int getValue();
     Node* getParent(int p);
-    vector<int> getChildren();
+    vector<Node*> getChildren();
     int getCounter();
     int getTimesVisited();
+    bool getIsVisited();
     bool getFinalResult();
     //increments
     void incrementParents();
@@ -45,9 +48,7 @@ int v2;         //vertice cujos ancestrais devem ser calculados
 int n_vertices; //numero de vertices
 int n_arcos;    //numero de arcos
 //dfs
-vector<int> color = *new vector<int>();
-vector<int> parent = *new vector<int>();
-int cycle_start, cycle_end;
+bool cyclic;
 //grafo
 vector<Node*> vertices;
 vector<Node*> commonParents;
@@ -121,14 +122,15 @@ int lerVerificarInputs(){
 }
 
 // metodos de Node
-Node::Node(int num, vector<int>* vector_children){
+Node::Node(int num, vector<Node*>* vector_children){
     value = num;
     parent1 = NULL;
     parent2 = NULL;
     children = *vector_children;
-    times_visited = 0;
+    is_visited = 0;
     aux_counter = 0;
     finalResult = 0;
+    times_visited = 0;
 }
 
 int Node::setParent(int int_parent){
@@ -148,7 +150,7 @@ int Node::setParent(int int_parent){
         return -1;
 }
 
-void Node::setChild(int c){ this->children.push_back(c); }
+void Node::setChild(int c){ this->children.push_back(getNode(c)); }
 
 int Node::getValue(){ return this->value; }
 
@@ -158,7 +160,7 @@ Node* Node::getParent(int p){
     return this->parent2;
 }
 
-vector<int> Node::getChildren(){ return this->children; }
+vector<Node*> Node::getChildren(){ return this->children; }
 
 void Node::incrementParents(){
     //increments parent1's counter
@@ -174,8 +176,10 @@ void Node::incrementParents(){
 
 int Node::getCounter(){ return this->aux_counter; }
 int Node::getTimesVisited(){ return this->times_visited; }
+bool Node::getIsVisited(){ return this->is_visited; }
 void Node::setCounter(){ this->aux_counter = 1; }
-void Node::setTimesVisited(){ this->times_visited = 1; }
+void Node::setTimesVisited(int t){ this->times_visited = t; }
+void Node::setIsVisited(){ this->is_visited = 1; }
 void Node::setFinalResult(){ this->finalResult = 1; }
 bool Node::getFinalResult(){ return this->finalResult; }
 
@@ -190,7 +194,7 @@ void inicializaGrafo() {
     vertices.push_back(NULL);
     // adiciona inicializa e adiciona os nós ao grafo
     for (int i = 1; i < n_vertices + 1; i++){
-        vector<int> *temp  = new vector<int>;
+        vector<Node*> *temp  = new vector<Node*>;
         vertices.push_back(new Node(i, temp));
     }
 }
@@ -199,34 +203,30 @@ void addEdge(int src, int dest){ getNode(src)->setChild(dest); }
 Node* getNode(int v){ return vertices.at(v); }
 
 //https://cp-algorithms.com/graph/finding-cycle.html
-bool dfs(int v) {
-    color[v] = 1;
-    for (int u : getNode(v)->getChildren()) {
-        if (color[u] == 0) {
-            parent[u] = v;
+bool dfs(Node* v) {
+    v->setTimesVisited(1);
+    for (Node* u: v->getChildren()) {
+        if (u->getTimesVisited() == 0) {
             if (dfs(u))
                 return true;
-        } else if (color[u] == 1) {
-            cycle_end = v;
-            cycle_start = u;
+        } else if (u->getTimesVisited() == 1) {
+            cyclic = true;
             return true;
         }
     }
-    color[v] = 2;
+    v->setTimesVisited(2);
     return false;
 }
 
 int find_cycle() {
-    color.assign(n_vertices, 0);
-    parent.assign(n_vertices, -1);
-    cycle_start = -1;
+    cyclic = false;
 
     for (int v = 1; v < n_vertices + 1; v++) {
-        if (color[v] == 0 && dfs(v))
+        if (getNode(v)->getTimesVisited() == 0 && dfs(getNode(v)))
             break;
     }
 
-    if (cycle_start == -1) {
+    if (cyclic == false) {
         return 0;
     } else {
         return -1;
@@ -237,9 +237,9 @@ void bfs(Node* v, int x){
     list<Node*> queue = *new list<Node*>();
     Node* Node_parent;
 
-    if (v->getTimesVisited() && x == 2)
+    if (v->getIsVisited() && x == 2)
         setCommonParents(v);
-    v->setTimesVisited();
+    v->setIsVisited();
 
     queue.push_back(v);
 
@@ -252,12 +252,12 @@ void bfs(Node* v, int x){
             if ((Node_parent = currVertex->getParent(i)) == NULL)
                 break;
             //senao: //acrescentar explicacao
-            if (!Node_parent->getTimesVisited()) {
+            if (!Node_parent->getIsVisited()) {
                 queue.push_back(Node_parent);
                 if (x == 1)
-                    Node_parent->setTimesVisited();
+                    Node_parent->setIsVisited();
             }
-            else if (Node_parent->getTimesVisited() && x == 2 && !Node_parent->getFinalResult()){
+            else if (Node_parent->getIsVisited() && x == 2 && !Node_parent->getFinalResult()){
                 Node_parent->setFinalResult();
                 setCommonParents(Node_parent);
                 queue.push_back(Node_parent);
