@@ -75,9 +75,9 @@ int main(){
     } else if (temp == -1)
         return 0; //se o input está incorreto
 
-    /* executa 2 BFS's: para cada vértice visitadol,
+    /* executa 2 BFS's: para cada vértice visitado,
     incrementa o contador de visitas de vertices */
-    bfs(getNode(v1), 1); //TODO: #8 BFS
+    bfs(getNode(v1), 1); 
     bfs(getNode(v2), 2);
 
     //por fim, executa a funcao solve que vai resolver o resto do problema
@@ -121,7 +121,7 @@ int lerVerificarInputs(){
     return 0;
 }
 
-// metodos de Node
+// construtor de Node
 Node::Node(int num, vector<Node*>* vector_children){
     value = num;
     parent1 = NULL;
@@ -135,17 +135,17 @@ Node::Node(int num, vector<Node*>* vector_children){
 
 int Node::setParent(int int_parent){
     Node* p = getNode(int_parent);
-    //if *this* has no parents
+    //se *this* não tem pais
     if (this->parent1 == NULL){
         this->parent1 = p;
         return 0;
     }
-    //if *this* has one parent
+    //se *this* tem um pai
     else if (this->parent2 == NULL){
         this->parent2 = p;
         return 0;
     }
-    //if *this* has both parents
+    //se *this* tem os dois pais
     else
         return -1;
 }
@@ -163,12 +163,12 @@ Node* Node::getParent(int p){
 vector<Node*> Node::getChildren(){ return this->children; }
 
 void Node::incrementParents(){
-    //increments parent1's counter
+    //incrementa aux_counter do parent1
     Node* temp;
     if ((temp = getParent(1)) != NULL){
         temp->aux_counter = 1;
     }
-    //increments parent2's counter
+    //incrementa aux_counter do parent2
     if ((temp = getParent(2)) != NULL){
         temp->aux_counter = 1;
     }
@@ -186,13 +186,13 @@ bool Node::getFinalResult(){ return this->finalResult; }
 
 void setCommonParents(Node* cp){ commonParents.push_back(cp);}
 
-// metodos de graph
+// inicializa os vetores globais do grafo
 void inicializaGrafo() {
     vertices = *new vector<Node*>();
     commonParents = *new vector<Node*>();
 
     vertices.push_back(NULL);
-    // adiciona inicializa e adiciona os nós ao grafo
+    // inicializa e adiciona os nós ao grafo
     for (int i = 1; i < n_vertices + 1; i++){
         vector<Node*> *temp  = new vector<Node*>;
         vertices.push_back(new Node(i, temp));
@@ -202,13 +202,17 @@ void inicializaGrafo() {
 void addEdge(int src, int dest){ getNode(src)->setChild(dest); }
 Node* getNode(int v){ return vertices.at(v); }
 
-//https://cp-algorithms.com/graph/finding-cycle.html
+
 bool dfs(Node* v) {
+    /*começa no nó do input, logo timesVisited passa a 1*/
     v->setTimesVisited(1);
+    /*percorre os filhos (adjacências) do nó do input*/
     for (Node* u: v->getChildren()) {
+        /*se ainda não tiver sido visitado e a dfs seja possivel*/
         if (u->getTimesVisited() == 0) {
             if (dfs(u))
                 return true;
+        /*se já tiver sido visitado então houve um backedge(cíclico)*/
         } else if (u->getTimesVisited() == 1) {
             cyclic = true;
             return true;
@@ -221,11 +225,14 @@ bool dfs(Node* v) {
 int find_cycle() {
     cyclic = false;
 
+    /*percorre a dfs para todos os vértices que ainda não foram visitados*/
     for (int v = 1; v < n_vertices + 1; v++) {
         if (getNode(v)->getTimesVisited() == 0 && dfs(getNode(v)))
             break;
     }
 
+    /*caso se tenha detetado um backedge nalguma das dfs devolve -1,
+    caso contrário devolve 0*/
     if (cyclic == false) {
         return 0;
     } else {
@@ -237,6 +244,7 @@ void bfs(Node* v, int x){
     list<Node*> queue = *new list<Node*>();
     Node* Node_parent;
 
+    /*caso v1 e v2 sejam familiares direta ou indiretamente*/
     if (v->getIsVisited() && x == 2)
         setCommonParents(v);
     v->setIsVisited();
@@ -251,12 +259,13 @@ void bfs(Node* v, int x){
             //se o node nao tiver o pai i,
             if ((Node_parent = currVertex->getParent(i)) == NULL)
                 break;
-            //senao: //acrescentar explicacao
+            //se o pai ainda não tiver sido visitado
             if (!Node_parent->getIsVisited()) {
                 queue.push_back(Node_parent);
                 if (x == 1)
                     Node_parent->setIsVisited();
             }
+            /*caso o pai ja esteja visitado e estiver na 2a BFS e o pai ainda não estiver no vetor da solução*/
             else if (Node_parent->getIsVisited() && x == 2 && !Node_parent->getFinalResult()){
                 Node_parent->setFinalResult();
                 setCommonParents(Node_parent);
@@ -285,7 +294,8 @@ void solve(){
             finalResult.push_back(n->getValue());
     }
 
-    sort(finalResult.begin(), finalResult.end()); //TODO: #6 #5 implementar a funcao sort;
+    /*ordena o vetor final por ordem crescente*/
+    sort(finalResult.begin(), finalResult.end());
 
     // imprime o resultado no terminal
     for (int j: finalResult){
